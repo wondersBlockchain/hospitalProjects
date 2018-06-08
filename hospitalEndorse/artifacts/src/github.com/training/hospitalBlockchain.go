@@ -28,7 +28,7 @@ const IndexName = "holderName~patientNo"
 const HolderIdDayTimeBillTypeBillNoIndexName = "holderId~dayTime-billType-billNo"
 
 // 票据
-type Bill struct {
+type Patient struct {
 	BillInfoID string `json:BillInfoID`                //票据号码
 	BillInfoAmt string `json:BillInfoAmt`              //票据金额
 	BillInfoType string `json:BillInfoType`            //票据类型
@@ -63,7 +63,7 @@ type chaincodeRet struct {
 }
 
 // chaincode
-type BillChaincode struct {
+type PatientChaincode struct {
 }
 
 // response message format
@@ -98,7 +98,7 @@ func getRetString(code int,des string) string {
 }
 
 // 根据票号取出票据
-func (a *BillChaincode) getBill(stub shim.ChaincodeStubInterface,bill_No string) (Bill, bool) {
+func (a *PatientChaincode) getBill(stub shim.ChaincodeStubInterface,bill_No string) (Bill, bool) {
 	var bill Bill
 	key := Patient_Prefix + bill_No
 	b,err := stub.GetState(key)
@@ -113,7 +113,7 @@ func (a *BillChaincode) getBill(stub shim.ChaincodeStubInterface,bill_No string)
 }
 
 // 保存票据
-func (a *BillChaincode) putBill(stub shim.ChaincodeStubInterface, bill Bill) ([]byte, bool) {
+func (a *PatientChaincode) putBill(stub shim.ChaincodeStubInterface, bill Bill) ([]byte, bool) {
 
 	byte,err := json.Marshal(bill)
 	if err!=nil {
@@ -128,13 +128,13 @@ func (a *BillChaincode) putBill(stub shim.ChaincodeStubInterface, bill Bill) ([]
 }
 
 // chaincode Init 接口
-func (a *BillChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
+func (a *PatientChaincode) Init(stub shim.ChaincodeStubInterface) pb.Response {
 	return shim.Success(nil)
 }
 
 // 票据发布
 // args: 0 - {Bill Object}
-func (a *BillChaincode) issue(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) issue(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)!=1 {
 		res := getRetString(1,"ChainnovaChaincode Invoke issue args!=1")
 		return shim.Error(res)
@@ -217,7 +217,7 @@ func (a *BillChaincode) issue(stub shim.ChaincodeStubInterface, args []string) p
 
 // 背书请求
 //  args: 0 - Bill_No ; 1 - Endorser CmId ; 2 - Endorser Acct
-func (a *BillChaincode) endorse(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) endorse(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)<3 {
 		res := getRetString(1,"ChainnovaChaincode Invoke endorse args<3")
 		return shim.Error(res)
@@ -295,7 +295,7 @@ func (a *BillChaincode) endorse(stub shim.ChaincodeStubInterface, args []string)
 
 // 背书人接受背书
 // args: 0 - Bill_No ; 1 - Endorser CmId ; 2 - Endorser Acct
-func (a *BillChaincode) accept(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) accept(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)<3 {
 		res := getRetString(1,"ChainnovaChaincode Invoke accept args<3")
 		return shim.Error(res)
@@ -334,7 +334,7 @@ func (a *BillChaincode) accept(stub shim.ChaincodeStubInterface, args []string) 
 
 // 背书人拒绝背书
 // args: 0 - Bill_No ; 1 - Endorser CmId ; 2 - Endorser Acct
-func (a *BillChaincode) reject(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) reject(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)<3 {
 		res := getRetString(1,"ChainnovaChaincode Invoke reject args<3")
 		return shim.Error(res)
@@ -373,7 +373,7 @@ func (a *BillChaincode) reject(stub shim.ChaincodeStubInterface, args []string) 
 
 // 查询我的票据:根据持票人编号 批量查询票据
 //  0 - Holder CmId ;
-func (a *BillChaincode) queryMyBill(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) queryMyBill(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)!=1 {
 		res := getRetString(1,"ChainnovaChaincode queryMyBill args!=1")
 		return shim.Error(res)
@@ -415,7 +415,7 @@ func (a *BillChaincode) queryMyBill(stub shim.ChaincodeStubInterface, args []str
 
 // 查询我的待背书票据: 根据背书人编号 批量查询票据
 //  0 - Endorser CmId ;
-func (a *BillChaincode) queryMyWaitBill(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) queryMyWaitBill(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)!=1 {
 		res := getRetString(1,"ChainnovaChaincode queryMyWaitBill args!=1")
 		return shim.Error(res)
@@ -460,7 +460,7 @@ func (a *BillChaincode) queryMyWaitBill(stub shim.ChaincodeStubInterface, args [
 
 // 根据票号取得票据 以及该票据背书历史
 //  0 - Bill_No ;
-func (a *BillChaincode) queryByBillNo(stub shim.ChaincodeStubInterface, args []string) pb.Response {
+func (a *PatientChaincode) queryByBillNo(stub shim.ChaincodeStubInterface, args []string) pb.Response {
 	if len(args)!=1 {
 		res := getRetString(1,"ChainnovaChaincode queryByBillNo args!=1")
 		return shim.Error(res)
@@ -513,7 +513,7 @@ func (a *BillChaincode) queryByBillNo(stub shim.ChaincodeStubInterface, args []s
 }
 
 // chaincode Invoke 接口
-func (a *BillChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
+func (a *PatientChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
     function,args := stub.GetFunctionAndParameters()
 	chaincodeLogger.Info("%s%s","ChainnovaChaincode function=",function)
 	chaincodeLogger.Info("%s%s","ChainnovaChaincode args=",args)
@@ -544,7 +544,7 @@ func (a *BillChaincode) Invoke(stub shim.ChaincodeStubInterface) pb.Response {
 }
 
 func main() {
-    if err := shim.Start(new(BillChaincode)); err != nil {
-        fmt.Printf("Error starting BillChaincode: %s", err)
+    if err := shim.Start(new(PatientChaincode)); err != nil {
+        fmt.Printf("Error starting PatientChaincode: %s", err)
     }
 }
